@@ -70,7 +70,7 @@ in order to fuzz around with the function, I have added some user input and remo
 
 First We’ll try fuzzing with the account (“user”) we have created at first place. Running the python script with the given parameters, **hash(“user”, session_id[user])**, and received the following hash. 
 
-![user cache script](https://gyazo.com/b6f8138354005d6f4a62f2a318877d96.png)
+![User cache script](https://gyazo.com/b6f8138354005d6f4a62f2a318877d96.png)
 
 We would like to investigate more about this function, how can we manipulate it in order to generate **[session_id]** to a specific user.
 
