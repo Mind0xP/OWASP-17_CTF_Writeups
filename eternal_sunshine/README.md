@@ -1,7 +1,7 @@
 # Eternal Sunshine
-	**Vector Type:** Web and Cryptography
+**Vector Type:** Web and Cryptography
 
-	**Description:** 
+**Description:** 
 
 > Simple -
 > Login as admin and get the flag
