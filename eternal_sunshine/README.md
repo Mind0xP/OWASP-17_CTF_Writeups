@@ -66,7 +66,27 @@ The hash function receives two arguments which is **[s]** that stands for **[ses
 
 in order to fuzz around with the function, I have added some user input and removed the unnecessary html output.
 
-![cache python script](https://gyazo.com/54823219ef083d9f5b742040f4e60035.png)
+```python
+#!/usr/bin/env python
+
+def hash(s, u1):
+         d = 0
+         u2 = "".join(hex(ord(c))[2:] for c in u1)
+         while len(u2) % (2 * 16) != 0:u2= "0" + u2
+         k = s + u2
+         for b_n in range(0, len(k) / 2 / 16):
+          b = k[b_n * 16 * 2:b_n * 16 * 2 + 16 * 2]
+          b_value = long (b, 16)
+          d = (d + b_value) % 340282366920938463463374607431768211456
+         return d
+
+#Get Parameters from user
+session_id = raw_input("Enter Session_id: ")
+user = raw_input("Enter User: ")
+#Print generated hash
+hash = 'Generated Hash: ' + str(hash(session_id, user))
+print hash
+```
 
 First We’ll try fuzzing with the account (“user”) we have created at first place. Running the python script with the given parameters, **hash(“user”, session_id[user])**, and received the following hash. 
 
