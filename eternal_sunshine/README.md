@@ -48,7 +48,7 @@ That is one serious error page, we can see that something failed within the appl
 
 By reading the error above, we can identify how the application authorizes users from its cache. So let’s break down the exception and understand how can we manipulate it for our malicious use. Now we will focus on the following code:
 
-```
+```python
 authorization_cache.isInCache(hash(sessionid, user))
 ```
 
