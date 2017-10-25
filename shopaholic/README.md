@@ -124,7 +124,7 @@ func getResource(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-The function takes two arguments: `http.ResponseWriter` which its value assembles the HTTP server's response, and http.Request which is a data structure that represents the client HTTP request. When invoking this function by accessing "/getResource" endpoint with a `path` parameter, a new `POST` request will be sent to `RESOURCE_SERVER` which is 127.0.0.1, following the `path` value afterwards. If we set `path` as "/test", then we will trigger the next request : 
+The function takes two arguments: `http.ResponseWriter` which its value assembles the HTTP server's response, and http.Request which is a data structure that represents the client HTTP request. When invoking this function by accessing "/getResource" endpoint with `GET` method and `path` parameter, a new `POST` request will be sent to `RESOURCE_SERVER` which is 127.0.0.1, following the `path` value afterwards. If we set `path` as "/test", then we will trigger the next request : 
 
 ```
 POST http://127.0.0.1/test HTTP/1.1
