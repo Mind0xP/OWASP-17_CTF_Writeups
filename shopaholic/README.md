@@ -78,7 +78,67 @@ var (
 
 We can see that there are some interesting declarations of global variables, which are used within the application. What are they?
 
-`RESOURCE_SERVER` - stores the localhost address.
+`RESOURCE_SERVER` - stores the localhost web URL.
 
-`CALCULATION_SERVER` - stores an **internal** URL for a calculation service.
+`CALCULATION_SERVER` - stores an **internal** URL for a calculation service at "10.0.0.185:8080/calc".
+
+Focusing on the `main()` function shows us the path of each page following their functions.
+
+```
+func main() {
+	r := mux.NewRouter()
+
+	// Dynamic Pages
+	r.HandleFunc("/getResource", getResource).Queries("path", "{path}")
+	r.HandleFunc("/downloadFile", downloadFile).Queries("file", "{file}")
+	r.HandleFunc("/calc", calc)
+	r.HandleFunc("/login", login)
+```
+
+The first function we are going to investigate is the `getResource()` function that is set under "/getResource" page.
+
+```
+func getResource(w http.ResponseWriter, r *http.Request) {
+	path := mux.Vars(r)["path"]
+	path = strings.Replace(path, " ", "%20", -1)
+	req, err := http.NewRequest("POST", RESOURCE_SERVER + path, nil)
+	req.Header.Set("Host", strings.Split(RESOURCE_SERVER, "//")[1])
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	if err != nil {
+		errorHandler(w, r, http.StatusInternalServerError, "")
+		return
+	}
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		errorHandler(w, r, http.StatusInternalServerError, "Resource Server Connection Error")
+		return
+	}
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+	response := string(body)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Server", "Golang HTTP Server")
+	fmt.Fprint(w, response)
+}
+```
+
+The function takes two arguments: `http.ResponseWriter` value assembles the HTTP server's response, and http.Request is a data structure that represents the client HTTP request. when invoking this function by accessing "/getResource" endpoint with a `path` parameter, a new `POST` request will be sent to `RESOURCE_SERVER` which is 127.0.0.1, following the `path` value afterwards. If we set `path` as "/test", then we will trigger the next request : 
+
+```
+POST http://127.0.0.1/test HTTP/1.1
+```
+
+Wait a minute... we can now send an HTTP request to any external and internal targets! and we got an interesting **internal calcuation server**, if the bell doesn't ring stay tuned for the next part.
+
+## Testing SSRF
+
+We will try and send a request with an empty `path` value, and see what we get.
+
+![SSRF trying localhost](https://gyazo.com/c01f284672f9277be6bed89dc585b0ad.png)
+
+Server response seems like an SSRF, so we can just specify any IP and access it, and we do have an internal IP to check, give it a try? 
+
+
 
