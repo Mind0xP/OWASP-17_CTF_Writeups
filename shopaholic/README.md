@@ -32,5 +32,8 @@ We will try some traditional directory traversal patterns, adding `../` just bef
 
 ![Testing file param](https://gyazo.com/43079f57389c26f370a0f7e339b7e813.png)
 
+Checking the presented response it looks like we are on the same folder ("downloads"), so it seems that there is some user input validation here, lets try and bypass it with encoded traversal strings.
+
+![Got our LFI](https://gyazo.com/c0fa593feec6e2c9eea6a9ee1f182c2a.png)
 
 
