@@ -10,7 +10,7 @@
 
 **Goal:** 
 
-Grabbing our flag via usage of a web vulnerability (or maybe some more, who knows?) within the application, while sticking to provided hits.
+Grabbing our flag via usage of a web vulnerability (or maybe some more, who knows?) within the application, while sticking to provided hints.
 
 ## Looking for a new TV
 
@@ -18,7 +18,7 @@ Let's go and access the web application via "http://smartstore.owaspctf17.pro". 
 
 ![Main web page](https://gyazo.com/36061c4b9a79de80a91e61c365ae4934.png)
 
-Wandering around the website and checking some features lead us to "Products" page, that contains every product that is available on the website, well most of it :)
+Wandering around the website and checking some features led us to "Products" page, that contains every product that is available on the website, well most of it :)
 On each product we have two available functions: "View Product", and "Download PDF". So let's ignite our proxy interceptor and test each one of these functions.
 
 Starting off with "Download PDF" on our desired TV, revealed us some interesting endpoint. 
@@ -32,11 +32,11 @@ We will try some traditional directory traversal patterns, adding `../` just bef
 
 ![Testing file param](https://gyazo.com/43079f57389c26f370a0f7e339b7e813.png)
 
-Checking the presented response it looks like we are on the same folder ("downloads"), so it seems that there is some user input validation here, lets try and bypass it with encoded traversal strings.
+Checking the presented response it looks like we are on the same folder ("downloads"), so it seems that there is some user input validation here, which filters out `../`. lets try and bypass it with encoded traversal strings.
 
 ![Got our LFI](https://gyazo.com/c0fa593feec6e2c9eea6a9ee1f182c2a.png)
 
-Vwalla! we got 200 OK sent back from the server, following "main.go" source code as promised. Now we must analyze and understand this piece of code, so we can seek for major flaws.
+Vwalla! we got 200 OK sent back from the server, following "main.go" source code as promised. Now we must analyze and understand this piece of code, so we can find some flaws.
 
 ## Analysing the main piece of code
 
