@@ -42,7 +42,7 @@ So let’s try and change the value of cookie `[user]` to “admin” and see wh
 
 ![Juicy error page](https://gyazo.com/22b3966c9eed41b33e9cf74896449440.png)
 
-That is one serious error page, we can see that something failed within the application right under the <title> tag. 
+That is one serious error page, we can see that something failed within the application right under the `<title>` tag. 
 
 ## Getting to know the lock mechanism
 
