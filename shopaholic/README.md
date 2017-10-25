@@ -161,3 +161,32 @@ After diging in his ways of bypassing common URL parsers, We can figure out that
 
 ![Filtering Bypass](https://gyazo.com/fc658ab20e11427a24a180c44fe9008d.png) 
 
+Now that we have got our SSRF working, we must understand how does the `calc()` function works. 
+
+## Back to the Code
+
+First lets dive into the `calc()` function, and figure out what it does.
+
+```
+func calc (w http.ResponseWriter, r *http.Request) {
+	item_id := r.URL.Query().Get("item_id")
+	country_code := r.URL.Query().Get("country_code")
+	quantity := r.URL.Query().Get("quantity")
+	if item_id == "" || country_code == "" || quantity == "" {
+		errorHandler(w, r, http.StatusInternalServerError, "Invalid Parameters")
+		return
+	}
+	_, err := strconv.Atoi(quantity)
+	if err == nil {
+		query := "?item_id=" + item_id + "&" + "country_code=" + country_code + "&" + "quantity=" + quantity
+		req, err := http.NewRequest("POST", CALCULATION_SERVER + query, nil)
+		req.Header.Set("Host", strings.Split(CALCULATION_SERVER, "//")[1])
+		{redacted}
+```
+
+When analysing the `calc()` function we see that a `POST` request is being sent to `CALCULATION_SERVER`, following three parameters: item_id, country_code, and quantity.
+Sending the request with random numbers actually worked.
+
+![Sending a request to calc](https://gyazo.com/d5cafc6762797fe0d70708e4d8d2c70d.png)
+
+
