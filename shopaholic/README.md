@@ -79,5 +79,5 @@ var (
 We can see that there are some interesting declarations of global variables, which are used within the application. What are they?
 
 `RESOURCE_SERVER` - stores the localhost address.
-`CALCULATION_SERVER` - stores an **internal** URL for a calculation service.
+*`CALCULATION_SERVER` - stores an **internal** URL for a calculation service.*
 
