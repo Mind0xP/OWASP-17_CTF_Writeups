@@ -10,7 +10,7 @@
 
 **Goal:** 
 
-Grabbing our flag by finding a web vulnerabilities within the application, while sticking to our attached hits.
+Grabbing our flag by finding a web vulnerability, or maybe some more, within the application, while sticking to our attached hits.
 
 ## Looking for a new TV
 
