@@ -138,9 +138,25 @@ We will try and send a request with an empty `path` value, and see what we get.
 
 ![SSRF trying localhost](https://gyazo.com/c01f284672f9277be6bed89dc585b0ad.png)
 
-Server response seems like an SSRF, so we can just specify any IP and access it, and we do have an internal IP to check, give it a try? 
+Server response seems like an SSRF, so we can just specify any IP and access it, and we do **have an internal IP** to check. but if we will try and set the `path` value to "10.0.0.185:8080" we will trigger the next request:
+
+```
+POST http://127.0.0.1/http://10.0.0.185:8080 HTTP/1.1
+```
+
+Which will result as an internal server error, so we must bypass it in a way that the server will ignore "127.0.0.1" address. 
+
+Maybe it relates to our second hint ?
+
+![Second hint](https://gyazo.com/c3ef920c2d2e5e878733b9a7d3ea7327.png)
+
+Black hat, Orange, and tsai? well lucky we have Google.
 
 
+So we get that its a famous hacker (which I personally respect alot), and his recent publishment on ways to exploit SSRF.
 
+![Google search](https://gyazo.com/d9dde342999d41b7524872a66dcddd48.png)
 
+After diging in his ways of bypassing common URL parsers, We can figure out that by adding the "@" sign at the start of `path` parameter, will ingore "127.0.0.1" on the request.
+ 
 
