@@ -158,5 +158,6 @@ So we get that its a famous hacker (which I personally respect alot), and his re
 ![Google search](https://gyazo.com/d9dde342999d41b7524872a66dcddd48.png)
 
 After diging in his ways of bypassing common URL parsers, We can figure out that by adding the "@" sign at the start of `path` parameter, will ingore "127.0.0.1" on the request.
- 
+
+![Filtering Bypass](https://gyazo.com/fc658ab20e11427a24a180c44fe9008d.png) 
 
