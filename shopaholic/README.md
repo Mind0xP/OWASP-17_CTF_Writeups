@@ -41,3 +41,38 @@ Vwalla! we got 200 OK sent back from the server, following "main.go" source code
 ## Analysing the main piece of code
 
 We will go step by step on each relevant piece of code in order to seek our flaws, and get to know the application better.
+
+```
+var (
+	RESOURCE_SERVER = "http://127.0.0.1"
+	DOWNLOAD_DIRECTORY = "./downloads/"
+	ILLEGAL_CHARS = []string {
+		"../",
+		"<!--",
+		"-->",
+		"<",
+		">",
+		"'",
+		"\"",
+		"&",
+		"$",
+		"#",
+		"{", "}", "[", "]", "=",
+		";", "?", "%20", "%22",
+		"%3c",   // <
+		"%253c", // <
+		"%3e",   // >
+		"",   // > -- fill in with % 0 e - without spaces in between
+		"%28",   // (
+		"%29",   // )
+		"%2528", // (
+		"%26",   // &
+		"%24",   // $
+		"%3f",   // ?
+		"%3b",   // ;
+		"%3d",   // =
+	}
+	CALCULATION_SERVER = "http://10.0.0.185:8080/calc"
+)
+```
+
