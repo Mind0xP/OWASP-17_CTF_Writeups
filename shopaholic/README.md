@@ -189,4 +189,4 @@ Sending the request with random numbers actually worked.
 
 ![Sending a request to calc](https://gyazo.com/d5cafc6762797fe0d70708e4d8d2c70d.png)
 
-
+Fuzzing around will 
