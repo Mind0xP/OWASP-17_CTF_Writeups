@@ -124,7 +124,7 @@ func getResource(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-The function takes two arguments: `http.ResponseWriter` value assembles the HTTP server's response, and http.Request is a data structure that represents the client HTTP request. when invoking this function by accessing "/getResource" endpoint with a `path` parameter, a new `POST` request will be sent to `RESOURCE_SERVER` which is 127.0.0.1, following the `path` value afterwards. If we set `path` as "/test", then we will trigger the next request : 
+The function takes two arguments: `http.ResponseWriter` which its value assembles the HTTP server's response, and http.Request which is a data structure that represents the client HTTP request. When invoking this function by accessing "/getResource" endpoint with a `path` parameter, a new `POST` request will be sent to `RESOURCE_SERVER` which is 127.0.0.1, following the `path` value afterwards. If we set `path` as "/test", then we will trigger the next request : 
 
 ```
 POST http://127.0.0.1/test HTTP/1.1
@@ -139,6 +139,8 @@ We will try and send a request with an empty `path` value, and see what we get.
 ![SSRF trying localhost](https://gyazo.com/c01f284672f9277be6bed89dc585b0ad.png)
 
 Server response seems like an SSRF, so we can just specify any IP and access it, and we do have an internal IP to check, give it a try? 
+
+
 
 
 
