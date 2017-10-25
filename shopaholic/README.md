@@ -36,4 +36,8 @@ Checking the presented response it looks like we are on the same folder ("downlo
 
 ![Got our LFI](https://gyazo.com/c0fa593feec6e2c9eea6a9ee1f182c2a.png)
 
+Vwalla! we got 200 OK sent back from the server, following "main.go" source code as promised. Now we must analyze and understand this piece of code, so we can seek for major flaws.
 
+## Analysing the main piece of code
+
+We will go step by step on each relevant piece of code in order to seek our flaws, and get to know the application better.
