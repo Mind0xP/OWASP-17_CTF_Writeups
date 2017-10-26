@@ -191,7 +191,7 @@ Sending the request with random numbers actually worked.
 
 Hold it! We are trying to send a request with parameters to a different webserver, via "SmartStore" website. So we must URL encode the ampersand "&" to "%26", and by that the second/third parameter will reach to our internal web server, and not to the "SmartStore" webserver.
 
-If We fuzz around with the parameters value, We will notice that `country_code` parameter does not effect the given output, On the other hand **`quantity` does return its value in the response output** when inserting a numeric digits.
+If We fuzz around with the parameters value, We will notice that `country_code` parameter does not effect the given output, On the other hand `quantity` **does return its value in the response output** when inserting a numeric digits.
 
 ![Quantity is being returned](https://gyazo.com/8cf7a909ed384e73dfc234978e974460.png)
 
