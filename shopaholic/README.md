@@ -184,9 +184,26 @@ func calc (w http.ResponseWriter, r *http.Request) {
 		{redacted}
 ```
 
-When analysing the `calc()` function we see that a `POST` request is being sent to `CALCULATION_SERVER`, following three parameters: item_id, country_code, and quantity.
+When analysing the `calc()` function we see that a `POST` request is being sent to `CALCULATION_SERVER`, following three parameters: `item_id`, `country_code`, and `quantity`.
 Sending the request with random numbers actually worked.
 
 ![Sending a request to calc](https://gyazo.com/d5cafc6762797fe0d70708e4d8d2c70d.png)
 
-Fuzzing around will 
+Hold it! We are trying to send a request with parameters to a different webserver, via "SmartStore" website. So we must URL encode the ampersand "&" to "%26", and by that the second/third parameter will reach to our internal web server, and not to the "SmartStore" webserver.
+
+If We fuzz around with the parameters value, We will notice that `country_code` parameter does not effect the given output, On the other hand **`quantity` does return its value in the response output** when inserting a numeric digits.
+
+![Quantity is being returned](https://gyazo.com/8cf7a909ed384e73dfc234978e974460.png)
+
+Let's try and add some special signs and see what we get.
+
+![Let the story begin](https://gyazo.com/568c58003c620940eceb2df17f6cfea9.png)
+
+Obviously "Expression Language" is being used here, So cancel all your appointments, We've got some work to do!
+
+## Expression Language Injection
+
+**Definition**
+>Expression Language (EL) Injection happens when attacker controlled data enters an EL interpreter.
+
+We can take some time and read an amazing EL Injection by "deadpool" ![Link to deadpool blog](http://deadpool.sh/2017/RCE-Springs/).
