@@ -189,7 +189,7 @@ Sending the request with random numbers actually worked.
 
 ![Sending a request to calc](https://gyazo.com/d5cafc6762797fe0d70708e4d8d2c70d.png)
 
-Hold it! We are trying to send a request with parameters to a different webserver, via "SmartStore" website. So we must URL encode the ampersand "&" to "%26", and by that the second/third parameter will reach to our internal web server, and not to the "SmartStore" webserver.
+Hold it! We are trying to send a request with parameters to a different webserver, via "SmartStore" website. So we must URL encode the ampersand "&" which equals to "%26", and by that the second/third parameter will reach to our internal web server, and not to the "SmartStore" webserver.
 
 If We fuzz around with the parameters value, We will notice that `country_code` parameter does not effect the given output, On the other hand `quantity` **does return its value in the response output** when inserting a numeric digits.
 
