@@ -54,7 +54,7 @@ authorization_cache.isInCache(hash(sessionid, user))
 
 Starting off with `authorization_cache[]` which looks like a `list/array/dict` that holds the current hashes of the registered/logged users, by using `isInCache()` function followed by calculating the hash using given `[sessionid]` and `[user]` cookies.
 
-![Auth flow](https://gyazo.com/8fbc68d574e12486aa1ba2623f80d746.png)
+![Auth flow](https://gyazo.com/8c4f18c1ac12351fe70aebf2322925f8.png)
 
 So each time a user registers, the server will generate a `[sessionid]` following the chosen `[user]`, and store it in `authorization_cache[]` using `hash()` function on the given parameters. then each time a user provides `[sessionid]` and `[user]` the server will use `hash()` function and compare the result to one of its stored hashes within `authorization_cache[]`.
 The ability to produce hashes using `hash()` function allows us to manipulate `[sessionid]` and adjust it to the desired user.
