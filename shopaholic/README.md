@@ -25,7 +25,10 @@ Starting off with "Download PDF" on our desired TV, revealed us some interesting
 
 ![Download PDF TV product](https://gyazo.com/128fd40b03d94ce50ebd7c402f987016.png)
 
-As we can already identify, a GET request is being sent to "/downloadFile" endpoint with a very interesting parameter, which is `file`, and it actually specifies a file that is stored on the webserver. Usually applications should validate user input, so when a page receives the given input to an unauthorized desired path, a directory traversal attack will not execute as of removing `..`, `../`, `.././`. 
+As we can already identify, a GET request is being sent to "/downloadFile" endpoint with a very interesting parameter, which is `file`, and it actually specifies a file that is stored on the webserver. Usually applications should validate user input, so when a page receives the given input to an unauthorized desired path, a directory traversal attack will not execute as of removing :
+> **`..`**
+> **`../`**
+> **`.././`**
 
 Our first hint was to try and look for "main.go" file that is probablly located somewhere on the server, so let's do it.
 We will try some traditional directory traversal patterns, adding `../` just before "main.go" in order to go back one folder.
