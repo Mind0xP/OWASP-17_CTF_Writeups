@@ -141,7 +141,7 @@ We will try and send a request with an empty `path` value, and see what we get.
 Server response seems like an SSRF, so we can just specify any IP and access it, and we do **have an internal IP** to check. but if we will try and set the `path` value to "10.0.0.185:8080" we will trigger the next request:
 
 ```
-POST http://127.0.0.1/http://10.0.0.185:8080 HTTP/1.1
+POST http://127.0.0.1/10.0.0.185:8080 HTTP/1.1
 ```
 
 Which will result as an internal server error, so we must bypass it in a way that the server will ignore "127.0.0.1" address. 
