@@ -217,7 +217,7 @@ T(java.lang.Runtime).getRuntime().exec('id')
 ```
 ![ID via ELi](https://gyazo.com/25f08203df2de8f37b453df5ecacf125.png)
 
-The request hangs for like 40 seconds, and we dont get any output on the HTTP response, so why not sending a command that doesn't require an HTTP response?
+The request hangs for like 40 seconds, and we dont get any output in the HTTP response, so why not sending a command that doesn't require an HTTP response?
 let's set an "nc" listener, and set `quantity` value to the next payload:
 
 
