@@ -102,9 +102,9 @@ We can see that there are some interesting declarations of global variables, whi
 
 `RESOURCE_SERVER` - stores the localhost web URL.
 
-`CALCULATION_SERVER` - stores an **internal** URL for a calculation service at "10.0.0.185:8080/calc".
-
 `ILLEGAL_CHAR` - stores an array of illegal chars as a string. now We can see which chars the application filters, and it's being used only in `SanitizeFilename()` function, on purpose of preventing common Directory Traversal attacks.
+
+`CALCULATION_SERVER` - stores an **internal** URL for a calculation service at "10.0.0.185:8080/calc".
 
 Focusing on the `main()` function shows us the path of each page following their functions.
 
