@@ -19,7 +19,7 @@ Let's go and access the web application via "http://smartstore.owaspctf17.pro". 
 ![Main web page](https://gyazo.com/36061c4b9a79de80a91e61c365ae4934.png)
 
 Wandering around the website and checking some features led us to "Products" page, that contains every product that is available on the website, well most of it :)
-On each product we have two available functions: "View Product", and "Download PDF". So let's ignite our proxy interceptor and test each one of these functions.
+On each product, we have two available functions: "View Product", and "Download PDF". So let's ignite our proxy interceptor and test each one of these functions.
 
 Starting off with "Download PDF" on our desired TV, revealed us some interesting endpoint. 
 
@@ -104,6 +104,8 @@ We can see that there are some interesting declarations of global variables, whi
 
 `CALCULATION_SERVER` - stores an **internal** URL for a calculation service at "10.0.0.185:8080/calc".
 
+`ILLEGAL_CHAR` - stores an array of illegal chars as a string. now We can see which chars the application filters, and it's being used only in `SanitizeFilename()` function, on purpose of preventing common Directory Traversal attacks.
+
 Focusing on the `main()` function shows us the path of each page following their functions.
 
 ```golang
@@ -187,7 +189,7 @@ Now that we have got our SSRF working, we must understand how does the `calc()` 
 
 ## Back to the Code
 
-First, lets dive into the `calc()` function, and figure out what it does.
+First, let's dive into the `calc()` function, and figure out what it does.
 
 ```golang
 func calc (w http.ResponseWriter, r *http.Request) {
