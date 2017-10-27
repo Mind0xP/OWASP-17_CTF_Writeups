@@ -46,7 +46,7 @@ $sanitized_value = str_replace($banned_array, "", $page);
 echo file_get_contents('../pages/'.$sanitized_value.'.php');
 ```
 
-its very simple, the `page` parameter receives its value via `GET` request, now the `banned_array[]` contains all the "bad signs" that could allow directory traversal. Then it will use `str_replace` to remove each value inside `banned_array[]` and store it in a new parameter `sanitized_value`, so if we set the `page` parameter to "../file", the final result of `sanitized_value` will be "file".
+its very simple, the `page` parameter receives its value via `GET` request, now the `banned_array[]` contains all the "bad signs" that could allow directory traversal. Then it will use `str_replace` to remove each value inside `banned_array[]` and store it in a new parameter `sanitized_value`. so if we set the `page` parameter to "../file", the final result of `sanitized_value` will be "file".
 
 Our first hint was to try and look for "main.go" file that is probablly located somewhere on the server, so let's grab it.
 
