@@ -25,17 +25,38 @@ Starting off with "Download PDF" on our desired TV, revealed us some interesting
 
 ![Download PDF TV product](https://gyazo.com/128fd40b03d94ce50ebd7c402f987016.png)
 
-As we can already identify, a GET request is being sent to "/downloadFile" endpoint with a very interesting parameter, which is `file`, and it actually specifies a file that is stored on the webserver. Usually applications should validate user input, so when a page receives the given input to an unauthorized desired path, a directory traversal attack will not execute as of removing :
+As we can already identify, a GET request is being sent to "/downloadFile" endpoint with a very interesting parameter, which is `file`, and it actually specifies a file that is stored on the webserver. Usually applications should validate user input, so when a page receives the given input it will escape all unauthorized signs as of **`/`** , **'.'**. So we can send some of the following right at the begining of the desired file:
+
 > **`..`**
 > **`../`**
 > **`.././`**
 
-Our first hint was to try and look for "main.go" file that is probablly located somewhere on the server, so let's do it.
-We will try some traditional directory traversal patterns, adding `../` just before "main.go" in order to go back one folder.
+Sometimes its better to visualize it by looking at an code example, and understand whats actually happens. lets take this PHP code for an example:
+
+```php 
+$page = $_GET['page'] ?? 'home';
+var $sanitized_value;
+$banned_array = array("../",
+					 "./",
+					 ".././");
+
+//sanitize the $_GET value.
+$sanitized_value = str_replace($banned_array, "", $page);
+}
+
+// return the requested sanitized file string
+echo file_get_contents('../pages/'.$sanitized_value.'.php');
+```
+
+its very simple, the `page` parameter receives its value via `GET` request, now the `banned_array[]` contains all the "bad signs" that could allow directory traversal. Then it will use `str_replace` to remove each value inside `banned_array[]` and store it in a new parameter `sanitized_value`, so if we set the `page` parameter to "../file", the final result of `sanitized_value` will be "file".
+
+Our first hint was to try and look for "main.go" file that is probablly located somewhere on the server, so let's grab it.
+
+We will try some traditional directory traversal patterns, adding by `../` just before "main.go" in order to go back one folder.
 
 ![Testing file param](https://gyazo.com/43079f57389c26f370a0f7e339b7e813.png)
 
-Checking the presented response it looks like we are on the same folder ("downloads"), so it seems that there is some user input validation here, which filters out `../`. lets try and bypass it with encoded traversal strings.
+Checking the presented response it looks like we are on the same folder ("downloads"), so it seems that there is some user input validation here, which filters out `../`. lets try and bypass it with **encoded traversal strings**, as an example **`..././`**.
 
 ![Got our LFI](https://gyazo.com/c0fa593feec6e2c9eea6a9ee1f182c2a.png)
 
