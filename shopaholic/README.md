@@ -36,9 +36,7 @@ Sometimes its better to visualize it by looking at an code example, and understa
 ```php 
 $page = $_GET['page'] ?? 'home';
 var $sanitized_value;
-$banned_array = array("../",
-	              "./",
-		          ".././");
+$banned_array = array("../", "./", ".././");
 
 //sanitize the $_GET value.
 $sanitized_value = str_replace($banned_array, "", $page);
