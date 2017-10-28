@@ -181,7 +181,7 @@ So we get that it's a famous hacker (which I personally respect a lot), and his 
 
 ![Google search](https://gyazo.com/d9dde342999d41b7524872a66dcddd48.png)
 
-After exploring his method of bypassing common URL parsers, We can figure out that by adding the "@" sign at the start of `path` parameter, will ignore "127.0.0.1" on the request.
+After exploring his method of bypassing common URL parsers, we can figure out that by adding the "@" sign at the start of `path` parameter, will ignore "127.0.0.1" on the request.
 
 ![Filtering Bypass](https://gyazo.com/fc658ab20e11427a24a180c44fe9008d.png) 
 
