@@ -10,11 +10,11 @@
 **Goal:** 
 
 The challenge was pretty simple: "Login as admin and get the flag”. 
-Now we must understand how to break down the authentication mechanism in order to login as the admin. 
+Now we must understand how to break down the authentication mechanism in order to log in as the admin. 
 
 ## Initial analysis
 
-First we would like to access the web application on "http://sunshine.owaspctf17.pro/“, and check each component within the application. as you may already have assumed by now, there is a login page, or registration form, we shall understand what the form actually do before going deeper.
+First, we would like to access the web application on "http://sunshine.owaspctf17.pro/“, and check each component within the application. as you may already have assumed by now, there is a login page or registration form, we shall understand what the form actually do before going deeper.
 
 ![Main login/registration page](https://gyazo.com/e9afba87e5fb54dad6a5533072276a99.png)
 
@@ -30,11 +30,11 @@ Within the response, we can see that a new cookie named `[session_id]` is genera
 
 ![Time for some cookies](https://gyazo.com/fc683dc1a688486d96f756348868442c.png)
 
-But may a regular user login to an administrative page? I doubt it. let’s try and reach the admin page with my current cookies by just accessing the “/admin” endpoint.
+But may a regular user login to an administrative page? I doubt it. let’s try and reach the admin page with the currently given cookies by just accessing the “/admin” endpoint.
 
 ![Admin - Access Denied](https://gyazo.com/5e562516225b23734c9cee6916d3dc4f.png)
 
-we have received access denied. It is absolutely not polite to reject your guests that way.
+we have received an access denied. It is absolutely not polite to reject your guests that way.
 
 Maybe we can register as the “admin”? that would be nice, but not possible. That’s the only account we cannot register, remember it.
 
@@ -61,10 +61,10 @@ The ability to produce hashes using `hash()` function allows us to manipulate `[
 
 ## Quick Scramble 
 
-The hash function receives two arguments which is `[s]` that stands for `[session_id]` and `[u1]` that stands for `[user]`, so each time we will insert a new `[session_id]` and `[user]` we should get a different hash. but how do we calculate the `[session_id]`? That's our main goal. 
+The hash function receives two arguments which are `[s]` that stands for `[session_id]` and `[u1]` that stands for `[user]`, so each time we will insert a new `[session_id]` and `[user]` we should get a different hash. but how do we calculate the `[session_id]`? That's our main goal. 
 
 
-in order to fuzz around with the function, I have added some user input and removed the unnecessary html output.
+in order to fuzz around with the function, I have added some user input and removed the unnecessary HTML output.
 
 ```python
 #!/usr/bin/env python
@@ -96,15 +96,15 @@ We would like to investigate more about this function, how can we manipulate it 
 
 So in order to minimize our work on comparing two hashes, we will create a user which is almost identical to our original user. We will do so by changing the last character “r” of our original user to the next letter in the alphabet which is “s”, and came up with “uses”.
 
-Next we will create a new user named “uses” via “/register” endpoint, and ran my script on the newly given `[session_id]` cookie, by executing `hash(“uses”, session_id[uses])`.
+Next, we will create a new user named “uses” via “/register” endpoint and let's run our script on the newly given `[session_id]` cookie, by executing `hash(“uses”, session_id[uses])`.
 
 ![uses cache script](https://gyazo.com/f2d69c448800ee6cf4ac03ce027a07f7.png)
 
-Wait, but the generated hash is totally different from the “user” one, so what are we going to compare? We do know that our main goal is to login into admin page and get our flag, but how are we going to achieve it? By creating a valid `[session_id]` for user “admin”. In the following steps we are going to try and calculate `[session_id]` of “user” with “uses” `[session_id]` using the hash function, confused? Let’s dig in. 
+Wait, but the generated hash is totally different from the “user” one, so what are we going to compare? We do know that our main goal is to login into admin page and get our flag, but how are we going to achieve it? By creating a valid `[session_id]` for user “admin”. In the following steps, we are going to try and calculate `[session_id]` of “user” with “uses” `[session_id]` using the hash function, confused? Let’s dig in. 
 
 ## Playing around with Hashes
 
-So we will calculate `hash(“user”, session_id[uses])`, In case you are asking yourselfs why, just remember that we are trying to create `[session_id]` for “user” with “uses” `[session_id]`.
+So we will calculate `hash(“user”, session_id[uses])`, In case you are asking yourselves why just remember that we are trying to create `[session_id]` for “user” with “uses” `[session_id]`.
 
 ![uses with diff sessionid cache script](https://gyazo.com/254eaff91f84a4d3d5bccb7b4ed3ae5d.png)
 
@@ -112,7 +112,7 @@ By comparing both “uses” and “user” generated hash we can notice a small
 
 ![hash compare](https://gyazo.com/e048b002e370069116eb48be16d8a2fb.png)
 
-Why did “1” changed to “0”? Well it’s pretty simple, in the alphabet the letter “S” comes after “R” so it means that when we ran our hash function the hash result will be lower, due to decreasing one letter from our user string. 
+Why did “1” changed to “0”? Well, it’s pretty simple, in the alphabet the letter “S” comes after “R” so it means that when we ran our hash function the hash result will be lower, due to decreasing one letter from our user string. 
 But how can we calculate the `[session_id]` for “user”? try and decrease the last value in “uses" `[session_id]` and check what hash we get. 
 
 ![changing sessionid param](https://gyazo.com/254eaff91f84a4d3d5bccb7b4ed3ae5d.png)
@@ -120,9 +120,6 @@ But how can we calculate the `[session_id]` for “user”? try and decrease the
 Wait… is it the same hash that “uses” has?! Christmas came early this year!
 So if we wrap everything around, we can try and replicate these steps on users “admin” and “admim”, so we can get “admin” `[session_id]` and eventually access “/admin” endpoint. 
 
-Finally, we get our little flag of happiness. 
-
 ![changing sessionid param](https://gyazo.com/ed6c0b5c2fa8820bf6f213c32b6bd4cd.png)
 
-
-
+Finally, we get our little flag of happiness. 
