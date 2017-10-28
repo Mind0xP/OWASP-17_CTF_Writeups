@@ -102,7 +102,7 @@ We can see that there are some interesting declarations of global variables, whi
 
 `RESOURCE_SERVER` - stores the localhost web URL.
 
-`ILLEGAL_CHAR` - stores an array of illegal chars as a string. now We can see which chars the application filters, and it's being used only in `SanitizeFilename()` function, on purpose of preventing common Directory Traversal attacks.
+`ILLEGAL_CHAR` - stores an array of illegal chars as a string. now we can see which chars the application filters, and it's being used only in `SanitizeFilename()` function, on purpose of preventing common Directory Traversal attacks.
 
 `CALCULATION_SERVER` - stores an **internal** URL for a calculation service at "10.0.0.185:8080/calc".
 
@@ -168,7 +168,7 @@ Server response seems like an SSRF, so we can just specify any IP and access it,
 POST http://127.0.0.1/10.0.0.185:8080 HTTP/1.1
 ```
 
-Which will result as an internal server error, so we must bypass it in a way that the server will ignore "127.0.0.1" address. 
+Which will result in an internal server error, so we must bypass it in a way that the server will ignore "127.0.0.1" address. 
 
 Maybe it relates to our second hint?
 
